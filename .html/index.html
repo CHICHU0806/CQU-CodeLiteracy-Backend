@@ -1,29 +1,294 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
-    <link rel="stylesheet" href="../.css/style.css"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>系统管理后台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: url('https://images.unsplash.com/photo-1552618321-33e89b99d89a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        /* 侧栏样式 - 优化激活状态 */
+        .sidebar {
+            width: 200px;
+            height: 100vh;
+            position: fixed;
+            z-index: 100;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            background: rgba(30, 30, 30, 0.7);
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .sidebar-header img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 3px;
+            display: none; /* 隐藏默认头像 */
+        }
+
+        .sidebar-header h3 {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer; /* 添加指针样式 */
+            transition: color 0.3s;
+        }
+
+        .sidebar-header h3:hover {
+            color: #F2876A; /* 悬停时变色 */
+        }
+
+        .sidebar-menu {
+            padding: 10px 0;
+        }
+
+        .sidebar-item {
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            border-left: 3px solid transparent;
+            position: relative;
+        }
+
+        .sidebar-item:hover {
+            background: rgba(242, 135, 106, 0.15);
+            color: #F2876A;
+        }
+
+        .sidebar-item.active {
+            background: rgba(242, 135, 106, 0.25);
+            color: #F2876A;
+            border-left: 3px solid #F2876A;
+            font-weight: 600;
+        }
+
+        .sidebar-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: #F2876A;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            margin-left: 200px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.95);
+            overflow-y: auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-header {
+            height: 60px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            padding: 0 25px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .content-placeholder {
+            padding: 30px 40px;
+            color: #555;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .content-placeholder h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .content-placeholder p {
+            font-size: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            .main-content {
+                margin-left: 0;
+                height: calc(100vh - 60px);
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="box">
-    <h2>Login</h2>
-    <div class="input-box">
-        <label>账号</label>
-        <input type="text" />
+<!-- 侧栏 -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <!-- 隐藏默认头像 -->
+        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="用户头像">
+        <!-- 修改为"未登录"，点击跳转到login.html -->
+        <h3 id="user-name" onclick="window.location.href='login.html'">未登录</h3>
     </div>
-    <div class="input-box">
-        <label>密码</label>
-        <input type="password" />
-    </div>
-    <div class="btn-box">
-        <a href="#">忘记密码?</a>
-        <div>
-            <button>登录</button>
-            <button>注册</button>
+
+    <div class="sidebar-menu">
+        <div class="sidebar-item active" data-page="home">
+            <i class="fas fa-home"></i> 首页
+        </div>
+        <div class="sidebar-item" data-page="course">
+            <i class="fas fa-book"></i> 课程学习
+        </div>
+        <div class="sidebar-item" data-page="study">
+            <i class="fas fa-calendar-check"></i> 学习打卡
+        </div>
+        <div class="sidebar-item" data-page="profile">
+            <i class="fas fa-user"></i> 个人中心
         </div>
     </div>
 </div>
 
+<!-- 主内容区域 -->
+<div class="main-content">
+    <div class="content-header">
+        <h2 id="current-page-title">首页</h2>
+    </div>
+
+    <!-- 修改内容区显示"请登录后查看" -->
+    <div class="content-placeholder">
+        <h3>请登录后查看</h3>
+        <p>点击左上角"未登录"，跳转到登录页面</p>
+    </div>
+</div>
+
+<script>
+    // 页面切换功能（仅提供JS建议，不包含完整实现）
+    document.addEventListener('DOMContentLoaded', function() {
+        // 获取所有侧边栏菜单项
+        const menuItems = document.querySelectorAll('.sidebar-item');
+
+        // 为每个菜单项添加点击事件
+        menuItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // 移除所有active类
+                menuItems.forEach(i => i.classList.remove('active'));
+
+                // 添加当前点击项的active类
+                this.classList.add('active');
+
+                // 获取当前点击的页面
+                const page = this.getAttribute('data-page');
+
+                // 更新标题
+                updatePageTitle(page);
+
+                // 根据页面类型加载内容
+                loadPageContent(page);
+            });
+        });
+
+        // 初始化加载首页
+        loadPageContent('home');
+    });
+
+    // 更新页面标题
+    function updatePageTitle(page) {
+        const titleMap = {
+            'home': '首页',
+            'course': '课程学习',
+            'study': '学习打卡',
+            'profile': '个人中心'
+        };
+
+        document.getElementById('current-page-title').textContent = titleMap[page];
+    }
+
+    // 加载页面内容（示例）
+    function loadPageContent(page) {
+        const contentPlaceholder = document.querySelector('.content-placeholder');
+
+        // 根据页面更新占位内容
+        let contentHTML = '';
+
+        switch(page) {
+            case 'home':
+                contentHTML = `
+                        <h3>欢迎使用学习管理系统</h3>
+                        <p>这里是系统首页，您可以查看最新通知和快捷操作</p>
+                        <div style="margin-top: 25px; padding: 15px; background: rgba(242, 135, 106, 0.08); border-radius: 8px;">
+                            <p><strong>今日通知:</strong> 请登陆后查看</p>
+
+                        </div>
+                    `;
+                break;
+
+            case 'course':
+                contentHTML = `
+                        <h3>课程学习</h3>
+                        <p>在这里您可以查看和学习所有课程内容</p>
+                        <div style="margin-top: 25px; padding: 15px; background: rgba(242, 135, 106, 0.08); border-radius: 8px;">
+                            <p><strong>当前课程:</strong> 请登陆后查看</p>
+
+                        </div>
+                    `;
+                break;
+
+            case 'study':
+                contentHTML = `
+                        <h3>学习打卡</h3>
+                        <p>完成每日学习任务，获取积分和奖励</p>
+                        <div style="margin-top: 25px; padding: 15px; background: rgba(242, 135, 106, 0.08); border-radius: 8px;">
+                            <p><strong>今日打卡:</strong> 请登陆后查看</p>
+
+                        </div>
+                    `;
+                break;
+
+            case 'profile':
+                contentHTML = `
+                        <h3>个人中心</h3>
+                        <p>管理您的个人信息和学习记录</p>
+                        <div style="margin-top: 25px; padding: 15px; background: rgba(242, 135, 106, 0.08); border-radius: 8px;">
+                            <p><strong>用户名:</strong> 请登陆后查看</p>
+
+                        </div>
+                    `;
+                break;
+        }
+
+        contentPlaceholder.innerHTML = contentHTML;
+    }
+</script>
 </body>
 </html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习管理系统</title>
+    <!-- 修正CSS路径：使用标准css目录 -->
+    <link rel="stylesheet" href="../.css/style.css"/>
+</head>
+<body>
+<div class="box">
+    <h2>登录系统</h2>
+    <div class="input-box">
+        <label for="username">登录账号</label>
+        <input type="text" id="username" placeholder="请输入用户名">
+        <label for="password">密码</label>
+        <input type="password" id="password" placeholder="请输入密码">
+    </div>
+    <div class="btn-box">
+        <a href="#">[忘记密码?]</a>
+        <div>
+            <button type="button" id="loginBtn">登录</button>
+            <button type="button" id="registerBtn">注册</button>
+        </div>
+    </div>
+    <!-- 修正：添加加载状态元素 -->
+    <div class="loading" id="loading" style="display: none;">
+        <div class="spinner"></div>
+        <p>正在验证身份...</p>
+    </div>
+</div>
+
+<script>
+    document.getElementById('registerBtn').addEventListener('click', function() {
+        window.location.href = 'register.html';
+    });
+
+    document.getElementById('loginBtn').addEventListener('click', function() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        if (!username || !password) {
+            alert('请输入用户名和密码');
+            return;
+        }
+
+        document.getElementById('loading').style.display = 'block';
+        this.disabled = true;
+
+        fetch('http://localhost:8080/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('网络响应异常');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // --- 关键修改：存入用户名 ---
+                    // 这样在 choice.html 页面就可以通过 localStorage.getItem('username') 拿到了
+                    localStorage.setItem('username', username);
+
+                    console.log("登录成功，用户名已存入本地存储");
+
+                    // 根据后端返回的角色进行跳转
+                    if (data.role === 'student') {
+                        window.location.href = 'home.html';
+                    } else if (data.role === 'teacher') {
+                        window.location.href = 'teacher.html';
+                    } else {
+                        // 如果后端还没定角色，跳转到选择页面
+                        window.location.href = 'choice.html';
+                    }
+                } else {
+                    throw new Error(data.message || '登录失败');
+                }
+            })
+            .catch(error => {
+                console.error('登录请求错误:', error);
+                alert('登录失败: ' + error.message);
+            })
+            .finally(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('loginBtn').disabled = false;
+            });
+    });
+</script>
+</body>
+</html>

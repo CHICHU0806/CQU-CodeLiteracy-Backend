@@ -2,105 +2,80 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
+    <title>注册</title>
     <link rel="stylesheet" href="../.css/style.css"/>
 </head>
 <body>
 <div class="box">
-    <h2>Register</h2>
+    <h2>用户注册</h2>
     <div class="input-box">
-        <label>输入账号</label>
-        <input type="text" id="username" />
+        <label>账号</label>
+        <input type="text" id="username" placeholder="请输入账号">
     </div>
     <div class="input-box">
-        <label>输入密码</label>
-        <input type="password" id="password" />
+        <label>密码</label>
+        <input type="password" id="password" placeholder="请输入密码">
     </div>
     <div class="input-box">
         <label>确认密码</label>
-        <input type="password" id="confirmPassword" />
+        <input type="password" id="confirmPassword" placeholder="请确认密码">
     </div>
     <div class="btn-box">
         <div>
-            <button id="registerBtn">确认注册</button>
-            <button id="loginBtn">返回登录</button>
+            <button type="button" id="registerBtn">确认注册</button>
+            <button type="button" onclick="location.href='index.html'">返回登录</button>
         </div>
     </div>
 </div>
 
 <script>
-    // DOM加载完成后执行
-    document.addEventListener('DOMContentLoaded', function() {
-        // 获取按钮元素
-        const registerBtn = document.getElementById('registerBtn');
-        const loginBtn = document.getElementById('loginBtn');
+    document.getElementById('registerBtn').addEventListener('click', function() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
 
-        // 获取输入框元素
-        const usernameInput = document.getElementById('username');
-        const passwordInput = document.getElementById('password');
-        const confirmPasswordInput = document.getElementById('confirmPassword');
+        if (!username || !password || !confirmPassword) {
+            alert('请输入所有字段');
+            return;
+        }
 
-        // 添加注册按钮点击事件
-        registerBtn.addEventListener('click', function() {
-            // 获取输入值
-            const username = usernameInput.value.trim();
-            const password = passwordInput.value;
-            const confirmPassword = confirmPasswordInput.value;
+        if (password !== confirmPassword) {
+            alert('密码不匹配');
+            return;
+        }
 
-            // 验证输入
-            if (!username) {
-                alert('请输入账号');
-                usernameInput.focus();
-                return;
-            }
+        const data = {
+            username: username,
+            password: password,
+            action: 'register'
+        };
 
-            if (!password) {
-                alert('请输入密码');
-                passwordInput.focus();
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                alert('密码与确认密码不一致');
-                confirmPasswordInput.focus();
-                return;
-            }
-
-            // 创建JSON数据
-            const userData = {
-                username: username,
-                password: password
-            };
-
-            // 发送JSON数据到后端
-            fetch('/api/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(userData)
+        // 发送请求到后端
+        fetch('http://localhost:8080/api/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('网络请求失败');
+                }
+                return response.json();
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('注册失败: ' + response.status);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    alert('注册成功！欢迎 ' + username + '！');
-                    // 清空表单
-                    document.getElementById('registerForm').reset();
-                })
-                .catch(error => {
-                    alert('注册失败: ' + error.message);
-                });
-        });
-
-        // 添加返回登录按钮点击事件
-        loginBtn.addEventListener('click', function() {
-            // 重定向到登录页面
-            window.location.href = 'login.html';
-        });
+            .then(data => {
+                if (data.success) {
+                    alert('注册成功!');
+                    window.location.href = 'index.html';
+                } else {
+                    alert('注册失败: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('注册过程中发生错误');
+            });
     });
 </script>
 </body>

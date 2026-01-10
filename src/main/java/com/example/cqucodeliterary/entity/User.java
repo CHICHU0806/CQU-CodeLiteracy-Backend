@@ -1,4 +1,4 @@
-package com.example.cqucodeliterary;
+package com.example.cqucodeliterary.entity;
 
 import jakarta.persistence.*; // 如果报错，请尝试改为 javax.persistence.*
 

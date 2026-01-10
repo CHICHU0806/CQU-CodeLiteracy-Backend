@@ -1,4 +1,4 @@
-package com.example.cqucodeliterary;
+package com.example.cqucodeliterary.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

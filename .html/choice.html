@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选择身份</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        .choice-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            width: 400px;
+            text-align: center;
+        }
+        .choice-container h1 {
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        .role-btn {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            width: 100%;
+            margin: 15px 0;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .role-btn:hover {
+            background: #3a7bd5;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        .role-btn.student {
+            background: #2ecc71;
+        }
+        .role-btn.student:hover {
+            background: #27ae60;
+        }
+    </style>
+</head>
+<body>
+<div class="choice-container">
+    <h1>请选择您的身份</h1>
+    <button class="role-btn student" onclick="selectRole('student')">学生</button>
+    <button class="role-btn teacher" onclick="selectRole('teacher')">教师</button>
+</div>
+
+<script>
+    // 从localStorage获取用户名（登录流程中已存储）
+    const username = localStorage.getItem('username') || '';
+
+    function selectRole(role) {
+        // 正确发送账号和role给后端
+        fetch('http://localhost:8080/api/rolechoose', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username: username,  // 修正：使用已获取的username
+                role: role
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('身份更新失败');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // 跳转到对应页面
+                    if (role === 'student') {
+                        window.location.href = 'home.html';
+                    } else if (role === 'teacher') {
+                        window.location.href = 'teacher.html';
+                    }
+                } else {
+                    alert(`更新失败: ${data.message}`);
+                }
+            })
+            .catch(error => {
+                console.error('身份更新错误:', error);
+                alert('网络错误，请稍后重试');
+            });
+    }
+</script>
+</body>
+</html>
