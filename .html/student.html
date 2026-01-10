@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>课程学习与学风建设 - 交互增强版</title>
+    <style>
+        body { margin: 0; height: 100vh; background-color: #eee; font-family: sans-serif; }
+        .shadow { box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .flex { display: flex; }
+        .baiSe { background-color: white; }
+        .flex1 { flex: 1; }
+        .column { flex-direction: column; }
+        .mg8 { margin: 8px; }
+        .mgr8 { margin-right: 8px; }
+        .mgt8 { margin-top: 8px; }
+
+        /* 列表项样式优化 */
+        .list-item {
+            height: 160px;
+            padding: 15px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: transform 0.2s; /* 添加平滑位移效果 */
+        }
+        .list-item:hover {
+            transform: translateY(-3px); /* 鼠标悬停微动 */
+        }
+
+        /* 弹窗遮罩层样式 */
+        #myModal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(2px); /* 背景模糊感 */
+        }
+        /* 弹窗主体样式 */
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 30px;
+            width: 400px;
+            border-radius: 12px;
+            text-align: center;
+            position: relative;
+        }
+
+        @media (max-width:600px) {
+            .ceBian { display: none; }
+            .neiRong, .shuJuQu { flex-direction: column; }
+            .youQu { margin-left: 8px; }
+            .shuJu { margin: 0 0 8px; flex: auto; }
+        }
+    </style>
+</head>
+<body class="flex">
+
+<div id="myModal">
+    <div class="modal-content shadow">
+        <h2 id="modal-title" style="margin-top: 0; color: #333;">课程详情</h2>
+        <p id="modal-desc" style="color: #666; line-height: 1.6; margin-bottom: 25px;"></p>
+        <div class="flex" style="justify-content: center; gap: 15px;">
+            <button onclick="closeModal()" style="padding: 10px 20px; background-color: #ccc; border: none; border-radius: 6px; cursor: pointer;">取消</button>
+            <button onclick="handleEnroll()" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">立即报名</button>
+        </div>
+    </div>
+</div>
+
+<div style="width: 200px;height: 100vh;position: fixed;z-index: 2" class="baiSe shadow">
+    <div style="padding: 10px;align-items: center;justify-content: center;border-bottom: 1px solid #999" class="flex">
+        <img id="user-avatar" src="电力涉网设备.png" width="40px" height="40px" alt="头像" style="border-radius: 50%">
+        <div id="user-name" style="margin-left: 10px; font-weight: bold;">正在加载...</div>
+    </div>
+    <div style="padding: 10px" class="flex column">
+        <div style="height: 40px;line-height: 40px;text-align: center;border-bottom: 1px solid #999;margin-bottom: 10px;">首页</div>
+        <div style="height: 40px;line-height: 40px;text-align: center;border-bottom: 1px solid #999;margin-bottom: 10px;">课程学习</div>
+        <div style="height: 40px;line-height: 40px;text-align: center;border-bottom: 1px solid #999;margin-bottom: 10px;">学风建设</div>
+        <div style="height: 40px;line-height: 40px;text-align: center;border-bottom: 1px solid #999;margin-bottom: 10px;">个人中心</div>
+    </div>
+</div>
+
+<div style="margin-left: 200px" class="flex1 column">
+    <div style="height: 60px;z-index: 1" class="baiSe shadow flex; align-items: center; padding: 0 20px;">
+        <h3 style="line-height: 60px; margin: 0 20px;">系统管理后台</h3>
+    </div>
+
+    <div style="overflow: auto" class="neiRong flex1 flex">
+        <div style="flex: 3" class="flex column mg8">
+            <div class="flex shuJuQu" id="stats-container">
+                <div style="height: 100px; padding: 10px;" class="shuJu flex1 baiSe shadow mgr8">统计1: --</div>
+                <div id="stat-enroll" style="height: 100px; padding: 10px;" class="shuJu flex1 baiSe shadow mgr8">报名总人数: 0</div>
+            </div>
+
+            <div class="flex column" id="course-list">
+                <div class="baiSe shadow mgt8 list-item">正在从 Java 后端获取列表...</div>
+            </div>
+        </div>
+
+        <div style="flex: 1" class="youQu flex column mgr8 mgt8">
+            <div style="height: 150px; padding: 15px;" class="baiSe shadow">公告栏</div>
+            <div style="height: 300px; padding: 15px;" class="baiSe shadow mgt8">最近消息</div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

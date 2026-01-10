@@ -1,34 +1,54 @@
 package com.example.cqucodeliterary;
 
+import jakarta.persistence.*; // 如果报错，请尝试改为 javax.persistence.*
+
 /**
- * 这是一个标准的 Java 实体类
- * 它代表了前端页面侧边栏需要展示的用户数据结构
+ * 升级后的实体类：既能对接前端展示，也能对接 SQLite 数据库
  */
+@Entity
+@Table(name = "users") // 指定在 SQLite 中生成的表名为 users
 public class User {
-    // 1. 私有属性：封装数据，不让外部直接修改
+
+    // 1. 必须有一个主键 ID，SQLite 会自动帮你从 1 开始数
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    // 2. 对应注册表单的数据
+    @Column(unique = true) // 用户名不能重复
+    private String username;
+    private String password;
+
+    // 3. 对应你之前的展示数据（可以先留着，或者以后完善）
     private String name;
     private String role;
     private String avatar;
 
-    // 2. 无参构造方法：Spring 内部通过反射创建对象时必须用到它
-    public User() {
+    // --- 构造方法 ---
+    public User() {}
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+        this.name = username; // 默认把用户名作为昵称
     }
 
-    // 3. 全参构造方法：方便我们在后端直接 new 出一个带数据的对象
-    public User(String name, String role, String avatar) {
-        this.name = name;
-        this.role = role;
-        this.avatar = avatar;
-    }
+    // --- Getter 和 Setter (必须要有，建议全部生成) ---
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
-    // 4. Getter 方法：这是 Spring 将对象转为 JSON 的关键“开关”
-    // Spring 默认会根据 getXXX 的名字来生成 JSON 的键名
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+
     public String getName() { return name; }
-    public String getRole() { return role; }
-    public String getAvatar() { return avatar; }
-
-    // 5. Setter 方法：以后从数据库读取数据填充对象时会用到
     public void setName(String name) { this.name = name; }
+
+    public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+
+    public String getAvatar() { return avatar; }
     public void setAvatar(String avatar) { this.avatar = avatar; }
 }
