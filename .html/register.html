@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="../.css/style.css"/>
+</head>
+<body>
+<div class="box">
+    <h2>Register</h2>
+    <div class="input-box">
+        <label>输入账号</label>
+        <input type="text" id="username" />
+    </div>
+    <div class="input-box">
+        <label>输入密码</label>
+        <input type="password" id="password" />
+    </div>
+    <div class="input-box">
+        <label>确认密码</label>
+        <input type="password" id="confirmPassword" />
+    </div>
+    <div class="btn-box">
+        <div>
+            <button id="registerBtn">确认注册</button>
+            <button id="loginBtn">返回登录</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // DOM加载完成后执行
+    document.addEventListener('DOMContentLoaded', function() {
+        // 获取按钮元素
+        const registerBtn = document.getElementById('registerBtn');
+        const loginBtn = document.getElementById('loginBtn');
+
+        // 获取输入框元素
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+
+        // 添加注册按钮点击事件
+        registerBtn.addEventListener('click', function() {
+            // 获取输入值
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+
+            // 验证输入
+            if (!username) {
+                alert('请输入账号');
+                usernameInput.focus();
+                return;
+            }
+
+            if (!password) {
+                alert('请输入密码');
+                passwordInput.focus();
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert('密码与确认密码不一致');
+                confirmPasswordInput.focus();
+                return;
+            }
+
+            // 创建JSON数据
+            const userData = {
+                username: username,
+                password: password
+            };
+
+            // 发送JSON数据到后端
+            fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('注册失败: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert('注册成功！欢迎 ' + username + '！');
+                    // 清空表单
+                    document.getElementById('registerForm').reset();
+                })
+                .catch(error => {
+                    alert('注册失败: ' + error.message);
+                });
+        });
+
+        // 添加返回登录按钮点击事件
+        loginBtn.addEventListener('click', function() {
+            // 重定向到登录页面
+            window.location.href = 'login.html';
+        });
+    });
+</script>
+</body>
+</html>
