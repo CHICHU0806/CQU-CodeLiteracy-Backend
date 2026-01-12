@@ -3,285 +3,277 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>系统管理后台</title>
+    <title>学习管理系统 - 个人主页</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             display: flex;
-            flex-direction: column;
             height: 100vh;
-            background: url('https://images.unsplash.com/photo-1552618321-33e89b99d89a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
+            /* 老师为你换了一个稳定的学习氛围背景图，或者你可以直接用渐变色 */
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            /* 如果坚持用图片，试试下面这个： */
+            /* background: url('https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed; */
             background-size: cover;
             font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
         }
 
-        /* 侧栏样式 - 优化激活状态 */
+        /* 侧栏 */
         .sidebar {
-            width: 200px;
-            height: 100vh;
-            position: fixed;
-            z-index: 100;
-            border-right: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            background: rgba(30, 30, 30, 0.7);
-            overflow-y: auto;
-            transition: all 0.3s ease;
+            width: 220px; height: 100vh; position: fixed; z-index: 100;
+            backdrop-filter: blur(10px); background: rgba(30, 30, 30, 0.8);
+            border-right: 1px solid rgba(255, 255, 255, 0.1); color: white;
         }
+        .sidebar-header { padding: 30px 15px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .sidebar-header img { width: 65px; height: 65px; border-radius: 50%; border: 2px solid #F2876A; margin-bottom: 10px; }
+        .sidebar-header h3 { color: #F2876A; font-size: 18px; }
 
-        .sidebar-header {
-            padding: 20px 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
-        }
-
-        .sidebar-header img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 2px solid #F2876A;
-            margin-bottom: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 3px;
-        }
-
-        .sidebar-header h3 {
-            margin: 0;
-            color: #F2876A;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .sidebar-menu {
-            padding: 10px 0;
-        }
-
+        .sidebar-menu { padding: 15px 0; }
         .sidebar-item {
-            padding: 14px 20px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 15px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            border-left: 3px solid transparent;
-            position: relative;
+            padding: 15px 25px; cursor: pointer; transition: 0.3s;
+            display: flex; align-items: center; gap: 12px; color: rgba(255, 255, 255, 0.7);
         }
+        .sidebar-item:hover, .sidebar-item.active { background: rgba(242, 135, 106, 0.2); color: #F2876A; }
+        .sidebar-item.active { border-left: 4px solid #F2876A; font-weight: bold; }
 
-        .sidebar-item:hover {
-            background: rgba(242, 135, 106, 0.15);
-            color: #F2876A;
+        /* 主区域 */
+        .main-content { margin-left: 220px; flex: 1; background: rgba(255, 255, 255, 0.96); overflow-y: auto; }
+        .content-header { height: 70px; background: white; padding: 0 30px; display: flex; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .container { padding: 30px; }
+
+        /* 课程卡片 */
+        .course-item {
+            background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #F2876A;
+            display: flex; justify-content: space-between; align-items: center;
         }
+        .course-link a { color: #F2876A; text-decoration: none; font-weight: bold; }
 
-        .sidebar-item.active {
-            background: rgba(242, 135, 106, 0.25);
-            color: #F2876A;
-            border-left: 3px solid #F2876A;
-            font-weight: 600;
+        /* 打卡面板 */
+        .stat-card { background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); text-align: center; margin-bottom: 25px;}
+        .score-val { font-size: 36px; color: #F2876A; font-weight: bold; }
+        #checkInBtnLarge {
+            background: #F2876A; color: white; border: none; padding: 12px 30px;
+            border-radius: 25px; font-size: 16px; cursor: pointer; transition: 0.3s;
         }
+        #checkInBtnLarge:disabled { background: #ccc; cursor: not-allowed; }
 
-        .sidebar-item.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 4px;
-            background: #F2876A;
-            border-radius: 0 4px 4px 0;
-        }
-
-        /* 主内容区域 */
-        .main-content {
-            margin-left: 200px;
-            height: 100vh;
-            background: rgba(255, 255, 255, 0.95);
-            overflow-y: auto;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .content-header {
-            height: 60px;
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            display: flex;
-            align-items: center;
-            padding: 0 25px;
-            font-size: 20px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .content-placeholder {
-            padding: 30px 40px;
-            color: #555;
-            text-align: center;
-            line-height: 1.6;
-        }
-
-        .content-placeholder h3 {
-            font-size: 24px;
-            margin-bottom: 15px;
-            color: #333;
-        }
-
-        .content-placeholder p {
-            font-size: 16px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
+        /* 响应式 */
         @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                border-right: none;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            }
-            .main-content {
-                margin-left: 0;
-                height: calc(100vh - 60px);
-            }
+            .sidebar { width: 70px; }
+            .sidebar-header h3, .sidebar-item span { display: none; }
+            .main-content { margin-left: 70px; }
         }
     </style>
 </head>
 <body>
-<!-- 侧栏 -->
+
 <div class="sidebar">
     <div class="sidebar-header">
-        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="用户头像">
-        <h3 id="user-name">张明</h3>
+        <img id="user-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Lucky" alt="头像">
+        <h3 id="display-username">加载中...</h3>
     </div>
-
     <div class="sidebar-menu">
-        <div class="sidebar-item active" data-page="home">
-            <i class="fas fa-home"></i> 首页
-        </div>
-        <div class="sidebar-item" data-page="course">
-            <i class="fas fa-book"></i> 课程学习
-        </div>
-        <div class="sidebar-item" data-page="study">
-            <i class="fas fa-calendar-check"></i> 学习打卡
-        </div>
-        <div class="sidebar-item" data-page="profile">
-            <i class="fas fa-user"></i> 个人中心
-        </div>
+        <div class="sidebar-item active" onclick="loadPage('home', this)"><i class="fas fa-home"></i> <span>首页</span></div>
+        <div class="sidebar-item" onclick="loadPage('course', this)"><i class="fas fa-book"></i> <span>课程学习</span></div>
+        <div class="sidebar-item" onclick="loadPage('study', this)"><i class="fas fa-calendar-alt"></i> <span>学习打卡</span></div>
+        <div class="sidebar-item" onclick="window.location.href='login.html'"><i class="fas fa-sign-out-alt"></i> <span>退出登录</span></div>
     </div>
 </div>
 
-<!-- 主内容区域 -->
 <div class="main-content">
-    <div class="content-header">
-        <h2 id="current-page-title">首页</h2>
-    </div>
-
-    <div class="content-placeholder">
-        <h3>欢迎使用学习管理系统</h3>
-        <p>点击左侧菜单栏的选项切换页面。当前页面：首页</p>
+    <div class="content-header"><h2 id="page-title">首页</h2></div>
+    <div id="page-container" class="container">
     </div>
 </div>
 
 <script>
-    // 页面切换功能（仅提供JS建议，不包含完整实现）
-    document.addEventListener('DOMContentLoaded', function() {
-        // 获取所有侧边栏菜单项
-        const menuItems = document.querySelectorAll('.sidebar-item');
+    const USERNAME = localStorage.getItem('username');
+    const API_BASE = "http://localhost:8080/api";
 
-        // 为每个菜单项添加点击事件
-        menuItems.forEach(item => {
-            item.addEventListener('click', function() {
-                // 移除所有active类
-                menuItems.forEach(i => i.classList.remove('active'));
-
-                // 添加当前点击项的active类
-                this.classList.add('active');
-
-                // 获取当前点击的页面
-                const page = this.getAttribute('data-page');
-
-                // 更新标题
-                updatePageTitle(page);
-
-                // 根据页面类型加载内容
-                loadPageContent(page);
-            });
-        });
-
-        // 初始化加载首页
-        loadPageContent('home');
+    // 1. 初始化页面
+    document.addEventListener('DOMContentLoaded', () => {
+        if (!USERNAME) {
+            alert("请先登录！");
+            window.location.href = 'login.html';
+            return;
+        }
+        document.getElementById('display-username').textContent = USERNAME;
+        loadPage('home');
     });
 
-    // 更新页面标题
-    function updatePageTitle(page) {
-        const titleMap = {
-            'home': '首页',
-            'course': '课程学习',
-            'study': '学习打卡',
-            'profile': '个人中心'
-        };
-
-        document.getElementById('current-page-title').textContent = titleMap[page];
-    }
-
-    // 加载页面内容（示例）
-    function loadPageContent(page) {
-        const contentPlaceholder = document.querySelector('.content-placeholder');
-
-        // 根据页面更新占位内容
-        let contentHTML = '';
-
-        switch(page) {
-            case 'home':
-                contentHTML = `
-                        <h3>欢迎使用学习管理系统</h3>
-                        <p>这里是系统首页，您可以查看最新通知和快捷操作</p>
-                        <div style="margin-top: 25px; padding: 15px; background: rgba(242, 135, 106, 0.08); border-radius: 8px;">
-                            <p><strong>今日通知:</strong> 课程系统更新，新增3门课程</p>
-                            <p><strong>学习进度:</strong> 45% (已完成 12/27 个任务)</p>
-                        </div>
-                    `;
-                break;
-
-            case 'course':
-                contentHTML = `
-                        <h3>课程学习</h3>
-                        <p>在这里您可以查看和学习所有课程内容</p>
-                        <div style="margin-top: 25px; padding: 15px; background: rgba(242, 135, 106, 0.08); border-radius: 8px;">
-                            <p><strong>当前课程:</strong> 电力系统基础</p>
-                            <p><strong>进度:</strong> 25% (已完成 3/12 个章节)</p>
-                            <p><strong>剩余时间:</strong> 2天 12小时</p>
-                        </div>
-                    `;
-                break;
-
-            case 'study':
-                contentHTML = `
-                        <h3>学习打卡</h3>
-                        <p>完成每日学习任务，获取积分和奖励</p>
-                        <div style="margin-top: 25px; padding: 15px; background: rgba(242, 135, 106, 0.08); border-radius: 8px;">
-                            <p><strong>今日打卡:</strong> 已完成</p>
-                            <p><strong>连续打卡:</strong> 5天</p>
-                            <p><strong>今日积分:</strong> +50</p>
-                        </div>
-                    `;
-                break;
-
-            case 'profile':
-                contentHTML = `
-                        <h3>个人中心</h3>
-                        <p>管理您的个人信息和学习记录</p>
-                        <div style="margin-top: 25px; padding: 15px; background: rgba(242, 135, 106, 0.08); border-radius: 8px;">
-                            <p><strong>用户名:</strong> 张明</p>
-                            <p><strong>学习积分:</strong> 1250</p>
-                            <p><strong>学习时长:</strong> 15.5小时</p>
-                            <p><strong>等级:</strong> 初级学员</p>
-                        </div>
-                    `;
-                break;
+    // 2. 页面切换逻辑
+    function loadPage(page, element) {
+        if (element) {
+            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+            element.classList.add('active');
         }
 
-        contentPlaceholder.innerHTML = contentHTML;
+        const container = document.getElementById('page-container');
+        document.getElementById('page-title').textContent = {home:'首页', course:'课程学习', study:'学习打卡'}[page];
+
+        if (page === 'home') {
+            container.innerHTML = `
+                <div class="stat-card">
+                    <h3>你好，${USERNAME}！</h3>
+                    <p>今天也是充满动力的一天，记得打卡哦。</p>
+                    <button id="checkInBtnLarge" onclick="handleCheckIn()">立即签到</button>
+                </div>
+                <div id="calendarContainer"></div>
+            `;
+            refreshCheckInStatus();
+            showCalendar();
+        } else if (page === 'course') {
+            renderCourses();
+        } else if (page === 'study') {
+            renderStudyStats();
+        }
+    }
+
+    // 3. 签到逻辑 (统筹后)
+    async function handleCheckIn() {
+        try {
+            const response = await fetch(`${API_BASE}/study/check-in`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: USERNAME })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                alert(data.message);
+                // 关键：强制更新本地存储的角色状态或直接刷新界面数据
+                await refreshCheckInStatus();
+            } else {
+                alert(data.message);
+            }
+        } catch (e) {
+            alert("签到失败，请稍后再试");
+        }
+    }
+
+    // 4. 获取并刷新分数状态
+    async function refreshCheckInStatus() {
+        if (!USERNAME) return;
+        try {
+            const res = await fetch(`${API_BASE}/study/score?username=${USERNAME}`);
+            const data = await res.json();
+
+            // 1. 更新按钮状态
+            const btn = document.getElementById('checkInBtnLarge');
+            if (data.isTodayChecked && btn) {
+                btn.textContent = "今日已签到";
+                btn.disabled = true;
+                btn.style.background = "#ccc";
+            }
+
+            // 2. 更新“首页”显示的文字（如果有）
+            // 3. 更新“打卡页”的分数
+            const scoreVal = document.getElementById('totalScoresVal');
+            const daysVal = document.getElementById('continuousDaysVal');
+
+            if (scoreVal) scoreVal.innerText = data.totalScores;
+            if (daysVal) daysVal.innerText = data.continuousDays;
+
+        } catch (e) {
+            console.error("刷新失败", e);
+        }
+    }
+
+    // 5. 课程渲染
+    // 5. 课程渲染 (对接你的后端 /api/courses/list 接口)
+    async function renderCourses() {
+        const container = document.getElementById('page-container');
+
+        // 渲染页面骨架
+        container.innerHTML = `
+        <div class="stat-card" style="text-align: left; margin-bottom: 25px;">
+            <h3 style="margin-bottom:10px;">加入新课程</h3>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="courseIdInput" placeholder="输入课程ID加入 (如: database)"
+                       style="flex:1; padding:12px; border:1px solid #ddd; border-radius:8px;">
+                <button onclick="handleJoinCourse()"
+                        style="background:#F2876A; color:white; border:none; padding:0 25px; border-radius:8px; cursor:pointer;">
+                    确认加入
+                </button>
+            </div>
+        </div>
+
+        <h3 style="margin-bottom:15px;"><i class="fas fa-university"></i> 课程广场</h3>
+        <div id="course-list-dynamic">正在从服务器同步课程数据...</div>
+    `;
+
+        try {
+            // 注意：这里路径要和你后端的 @RequestMapping + @GetMapping 一致
+            const response = await fetch(`${API_BASE}/courses/list`);
+            const courses = await response.json();
+
+            const listContainer = document.getElementById('course-list-dynamic');
+
+            if (!courses || courses.length === 0) {
+                listContainer.innerHTML = "<p>数据库里空空如也，请先在数据库添加几条课程记录吧。</p>";
+                return;
+            }
+
+            let html = "";
+            courses.forEach(c => {
+                html += `
+                <div class="course-item">
+                    <div>
+                        <h4 style="margin-bottom:5px;">${c.name}</h4>
+                        <p style="font-size:13px; color:#666;">
+                            讲师：${c.teacher || '待定'} | 编号: <span style="color:#F2876A;">${c.id}</span>
+                        </p>
+                    </div>
+                    <div class="course-link">
+                        <button onclick="handleJoinCourse('${c.id}')"
+                                style="background:transparent; border:1px solid #F2876A; color:#F2876A; padding:6px 16px; border-radius:20px; cursor:pointer; font-weight:bold;">
+                            加入课程
+                        </button>
+                    </div>
+                </div>`;
+            });
+            listContainer.innerHTML = html;
+
+        } catch (error) {
+            console.error("加载失败:", error);
+            document.getElementById('course-list-dynamic').innerHTML = "<p style='color:red;'>连接后端失败，请检查 Spring Boot 端口 8080 是否已启动。</p>";
+        }
+    }
+
+    // 6. 打卡页统计渲染
+    async function renderStudyStats() {
+        document.getElementById('page-container').innerHTML = `
+            <div class="stat-card">
+                <p>总积分</p>
+                <div class="score-val" id="totalScoresVal">...</div>
+                <p style="margin-top:15px;">连续打卡天数</p>
+                <div class="score-val" id="continuousDaysVal" style="color:#4ECDC4">...</div>
+            </div>
+        `;
+        refreshCheckInStatus();
+    }
+
+    // 7. 日历组件 (增强版：自动标记签到)
+    function showCalendar() {
+        const container = document.getElementById('calendarContainer');
+        if (!container) return;
+        const now = new Date();
+        const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+
+        let html = `<div style="background:#fff; padding:20px; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.05)">
+            <h4 style="margin-bottom:15px;">${now.getFullYear()}年${now.getMonth()+1}月 签到月历</h4>
+            <div style="display:grid; grid-template-columns: repeat(7, 1fr); gap:10px; text-align:center;">
+        `;
+        // 简易渲染 1 到 最后一天的方格
+        for(let d=1; d<=daysInMonth; d++) {
+            const isToday = d === now.getDate();
+            // 注意：这里今日状态标记可以根据 refreshCheckInStatus 的结果来增强，目前简单处理
+            const style = isToday ? "background:#F2876A; color:#fff; border-radius:50%;" : "border:1px solid #eee; border-radius:8px;";
+            html += `<div style="padding:10px; ${style}">${d}</div>`;
+        }
+        html += `</div></div>`;
+        container.innerHTML = html;
     }
 </script>
 </body>

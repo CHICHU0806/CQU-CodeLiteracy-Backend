@@ -6,6 +6,7 @@
     <title>学习管理系统</title>
     <!-- 修正CSS路径：使用标准css目录 -->
     <link rel="stylesheet" href="../.css/style.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
 <div class="box">
@@ -31,62 +32,61 @@
 </div>
 
 <script>
-    document.getElementById('registerBtn').addEventListener('click', function() {
+    // 跳转注册
+    document.getElementById('registerBtn').addEventListener('click', () => {
         window.location.href = 'register.html';
     });
 
-    document.getElementById('loginBtn').addEventListener('click', function() {
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
+    // 登录逻辑
+    document.getElementById('loginBtn').addEventListener('click', async function() {
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
 
         if (!username || !password) {
-            alert('请输入用户名和密码');
+            alert('请填写完整信息');
             return;
         }
 
-        document.getElementById('loading').style.display = 'block';
-        this.disabled = true;
+        const loading = document.getElementById('loading');
+        const btn = this;
 
-        fetch('http://localhost:8080/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('网络响应异常');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    // --- 关键修改：存入用户名 ---
-                    // 这样在 choice.html 页面就可以通过 localStorage.getItem('username') 拿到了
-                    localStorage.setItem('username', username);
+        loading.style.display = 'block';
+        btn.disabled = true;
 
-                    console.log("登录成功，用户名已存入本地存储");
-
-                    // 根据后端返回的角色进行跳转
-                    if (data.role === 'student') {
-                        window.location.href = 'home.html';
-                    } else if (data.role === 'teacher') {
-                        window.location.href = 'teacher.html';
-                    } else {
-                        // 如果后端还没定角色，跳转到选择页面
-                        window.location.href = 'choice.html';
-                    }
-                } else {
-                    throw new Error(data.message || '登录失败');
-                }
-            })
-            .catch(error => {
-                console.error('登录请求错误:', error);
-                alert('登录失败: ' + error.message);
-            })
-            .finally(() => {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('loginBtn').disabled = false;
+        try {
+            const response = await fetch('http://localhost:8080/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
             });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // 存储登录状态
+                localStorage.setItem('username', username);
+                localStorage.setItem('role', data.role);
+
+                alert('登录成功！欢迎回来');
+
+                // 根据角色跳转
+                if (data.role === 'STUDENT') {
+                    window.location.href = 'home.html';
+                } else if (data.role === 'TEACHER') {
+                    window.location.href = 'teacher.html';
+                } else {
+                    window.location.href = 'choice.html';
+                }
+            } else {
+                alert('登录失败：' + data.message);
+            }
+        } catch (error) {
+            console.error('错误:', error);
+            alert('服务器连接失败，请检查后端服务是否启动');
+        } finally {
+            loading.style.display = 'none';
+            btn.disabled = false;
+        }
     });
 </script>
 </body>
